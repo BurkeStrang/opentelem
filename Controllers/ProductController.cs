@@ -15,11 +15,13 @@ public class ProductsController(ApplicationDbContext context) : ControllerBase
   public async Task<IActionResult> GetSlowProducts()
   {
     var products = await _context.Products
-        .GroupBy(l => l.Name)
-        .Select(g => new { Name = g.Key, Count = g.Count() })
-        .Where(g => g.Count > 1)
+        .SelectMany(p1 => _context.Products, (p1, p2) => new { p1, p2 })
+        .GroupBy(l => new { Price1 = l.p1.Price, Price2 = l.p2.Price })
+        .Select(g => new { Price = g.Key, Count = g.Count() })
         .ToListAsync();
+
     return Ok(products);
+
   }
 
   [HttpGet]

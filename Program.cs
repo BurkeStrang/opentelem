@@ -6,18 +6,34 @@ using opentelem.Models;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+// using OpenTelemetry.Exporter.Prometheus;
+// using System.Diagnostics.Metrics;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+// Meter meter = new("MyApiService.QueryMetrics", "1.0.0");
+// Histogram<double> queryDurationHistogram = meter.CreateHistogram<double>("sql.query.duration", unit: "seconds", description: "Duration of SQL queries");
 
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Server=sqlserver;Database=MyApiDb;User=sa;Password=Your_password123;TrustServerCertificate=true;";
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, sqlOptions =>
+    {
+      sqlOptions.CommandTimeout(60);
+    }));
 
 builder.Services.AddControllers();
 
 builder.Services.AddOpenTelemetry()
+    .WithMetrics(meterProviderBuilder =>
+    {
+      meterProviderBuilder
+          .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("MyApiService"))
+          .AddAspNetCoreInstrumentation()
+          .AddSqlClientInstrumentation()
+          .AddPrometheusExporter();
+    })
     .WithTracing(tracerProviderBuilder =>
     {
       tracerProviderBuilder
@@ -39,15 +55,11 @@ builder.Services.AddOpenTelemetry()
           })
           .AddEntityFrameworkCoreInstrumentation()
           .AddConsoleExporter();
-      // if everything is working as expected, you can replace the ConsoleExporter with the following:
-      // .AddApplicationInsightsExporter(o =>
-      // {
-      //     // Replace with your actual Application Insights connection string
-      //     o.ConnectionString = "InstrumentationKey=INSTRUMENTATION_KEY"
-      // });
     });
 
 WebApplication app = builder.Build();
+
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.UseMiddleware<RequestBodyLoggingMiddleware>();
 app.UseRouting();
