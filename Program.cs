@@ -47,7 +47,7 @@ builder.Services.AddOpenTelemetry()
       // });
     });
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseMiddleware<RequestBodyLoggingMiddleware>();
 app.UseRouting();
@@ -69,11 +69,11 @@ app.Run();
 
 static void SeedDatabase(ApplicationDbContext context)
 {
-  var productFaker = new Faker<Product>()
-      .RuleFor(p => p.Name, f => f.Commerce.ProductName())
-      .RuleFor(p => p.Price, f => f.Random.Decimal(1, 1000));
+  Faker<Product> productFaker = new Faker<Product>()
+    .RuleFor(p => p.Name, f => f.Commerce.ProductName())
+    .RuleFor(p => p.Price, f => f.Random.Decimal(1, 1000));
 
-  var products = productFaker.Generate(10000);
+  List<Product> products = productFaker.Generate(10000);
 
   context.Products.AddRange(products);
   context.SaveChanges();

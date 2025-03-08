@@ -2,13 +2,9 @@
 GET http://localhost:8080/api/products
 Content-Type: application/json
 
-###
-
 ### GET all products/slow
 GET http://localhost:8080/api/products/slow
 Content-Type: application/json
-
-###
 
 ### POST a new product
 POST http://localhost:8080/api/products
