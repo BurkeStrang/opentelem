@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("opentelem")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7692dacac201e208fe3a6e0ad22ef2f84b165aeb")]
 [assembly: System.Reflection.AssemblyProductAttribute("opentelem")]
 [assembly: System.Reflection.AssemblyTitleAttribute("opentelem")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
