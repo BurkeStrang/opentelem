@@ -14,14 +14,16 @@ public class ProductsController(ApplicationDbContext context) : ControllerBase
   [HttpGet("slow")]
   public async Task<IActionResult> GetSlowProducts()
   {
+    // this fails
     var products = await _context.Products
         .SelectMany(p1 => _context.Products, (p1, p2) => new { p1, p2 })
-        .GroupBy(l => new { Price1 = l.p1.Price, Price2 = l.p2.Price })
+        .SelectMany(p => _context.Products, (p, p3) => new { p.p1, p.p2, p3 })
+        .GroupBy(l => l.p1.Price, l => l.p2.Price)
         .Select(g => new { Price = g.Key, Count = g.Count() })
+        .OrderByDescending(g => g.Count)
+        .ThenByDescending(g => g.Price)
         .ToListAsync();
-
     return Ok(products);
-
   }
 
   [HttpGet]
