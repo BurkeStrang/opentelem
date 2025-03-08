@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "Your_password123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+
+  myapi:
+    build: .
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MyApiDb;User=sa;Password=Your_password123;TrustServerCertificate=true;
+    depends_on:
+      - sqlserver
+    ports:
+      - "8080:8080"
+
+volumes:
+  sqlserverdata:
